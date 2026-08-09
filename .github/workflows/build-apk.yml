@@ -1,0 +1,71 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Lay source
+        uses: actions/checkout@v4
+
+      - name: Cai Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Tao project Android
+        run: |
+          flutter create \
+            --platforms=android \
+            --org vn.angianglens \
+            --project-name angiang_lens \
+            build_app
+
+          rm -rf build_app/lib
+          cp -R lib build_app/lib
+
+          rm -rf build_app/assets
+          cp -R assets build_app/assets
+
+          cp pubspec.yaml build_app/pubspec.yaml
+
+      - name: Dat Android minSdk 26
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          files = [
+              Path("build_app/android/app/build.gradle.kts"),
+              Path("build_app/android/app/build.gradle")
+          ]
+
+          for p in files:
+              if p.exists():
+                  text = p.read_text()
+                  text = text.replace(
+                      "minSdk = flutter.minSdkVersion",
+                      "minSdk = 26"
+                  )
+                  text = text.replace(
+                      "minSdkVersion flutter.minSdkVersion",
+                      "minSdkVersion 26"
+                  )
+                  p.write_text(text)
+          PY
+
+      - name: Tai thu vien
+        working-directory: build_app
+        run: flutter pub get
+
+      - name: Build APK
+        working-directory: build_app
+        run: flutter build apk --release
+
+      - name: Dua APK len GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: AnGiangLens-APK
+          path: build_app/build/app/outputs/flutter-apk/app-release.apk
