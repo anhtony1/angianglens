@@ -60,6 +60,11 @@ jobs:
         working-directory: build_app
         run: flutter pub get
 
+      - name: Sua loi Java Kotlin TFLite
+        working-directory: build_app
+        run: |
+          echo "kotlin.jvm.target.validation.mode=warning" >> android/gradle.properties
+
       - name: Build APK
         working-directory: build_app
         run: flutter build apk --release
