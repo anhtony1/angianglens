@@ -1,0 +1,29 @@
+name: angiang_lens
+description: AnGiang Lens - nhận diện địa điểm du lịch bằng AI offline.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  tflite_flutter: ^0.12.1
+  image_picker: ^1.2.3
+  image: ^4.9.1
+  flutter_tts: ^4.2.5
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/ai/angiang_lens_model.tflite
+    - assets/ai/angiang_lens_database.json
+    - assets/content/place_catalog.json

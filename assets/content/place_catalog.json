@@ -1,0 +1,18 @@
+{
+  "Mieu_BCX": {
+    "name": "Miếu Bà Chúa Xứ Núi Sam",
+    "location": "Núi Sam, An Giang",
+    "icon": "🏛️",
+    "description": "Miếu Bà Chúa Xứ Núi Sam là một địa điểm văn hóa, tín ngưỡng và du lịch nổi tiếng của An Giang. Nơi đây thu hút đông đảo người dân và du khách đến tham quan, hành hương và tìm hiểu các giá trị văn hóa địa phương.",
+    "videoUrl": "",
+    "images": []
+  },
+  "ho_PT": {
+    "name": "Hòn Phụ Tử",
+    "location": "An Giang",
+    "icon": "🌊",
+    "description": "Hòn Phụ Tử là một thắng cảnh nổi tiếng với cảnh quan thiên nhiên đặc sắc. Địa danh gắn với những câu chuyện văn hóa dân gian và là một điểm tham quan tiêu biểu khi khám phá du lịch An Giang.",
+    "videoUrl": "",
+    "images": []
+  }
+}
