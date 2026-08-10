@@ -70,11 +70,19 @@ class _ScoredSample {
 
 class AiService {
   Interpreter? _interpreter;
+
   final List<_Sample> _samples = [];
+
   double _threshold = 0.75;
 
   double get threshold => _threshold;
-  bool get isReady => _interpreter != null && _samples.isNotEmpty;
+
+  bool get isReady =>
+      _interpreter != null && _samples.isNotEmpty;
+
+  // =====================================================
+  // KHỞI TẠO MODEL + DATABASE
+  // =====================================================
 
   Future<void> initialize() async {
     _interpreter = await Interpreter.fromAsset(
@@ -84,127 +92,524 @@ class AiService {
     final raw = await rootBundle.loadString(
       'assets/ai/angiang_lens_database.json',
     );
-    final data = jsonDecode(raw) as Map<String, dynamic>;
 
-    _threshold = (data['threshold'] as num?)?.toDouble() ?? 0.75;
-    final items = data['items'] as List<dynamic>? ?? const [];
+    final data =
+        jsonDecode(raw) as Map<String, dynamic>;
+
+    _threshold =
+        (data['threshold'] as num?)?.toDouble() ??
+            0.75;
+
+    final items =
+        data['items'] as List<dynamic>? ??
+            const [];
+
     _samples
       ..clear()
-      ..addAll(items.map((item) {
-        final m = item as Map<String, dynamic>;
-        return _Sample(
-          m['label'].toString(),
-          (m['embedding'] as List<dynamic>)
-              .map((v) => (v as num).toDouble())
-              .toList(growable: false),
-        );
-      }));
+      ..addAll(
+        items.map(
+          (item) {
+            final m =
+                item as Map<String, dynamic>;
+
+            return _Sample(
+              m['label'].toString(),
+              (m['embedding'] as List<dynamic>)
+                  .map(
+                    (v) =>
+                        (v as num).toDouble(),
+                  )
+                  .toList(
+                    growable: false,
+                  ),
+            );
+          },
+        ),
+      );
 
     if (_samples.isEmpty) {
-      throw StateError('Database AI không có ảnh mẫu.');
+      throw StateError(
+        'Database AI không có ảnh mẫu.',
+      );
     }
 
-    final outputDim = _interpreter!.getOutputTensor(0).shape.last;
-    if (_samples.first.embedding.length != outputDim) {
+    final outputDim =
+        _interpreter!
+            .getOutputTensor(0)
+            .shape
+            .last;
+
+    if (_samples.first.embedding.length !=
+        outputDim) {
       throw StateError(
-        'Embedding database (${_samples.first.embedding.length}) không khớp output model ($outputDim).',
+        'Embedding database '
+        '(${_samples.first.embedding.length}) '
+        'không khớp output model '
+        '($outputDim).',
       );
     }
   }
 
-  Future<RecognitionResult?> recognize(Uint8List bytes) async {
-    if (!isReady) throw StateError('AI chưa sẵn sàng.');
+  // =====================================================
+  // NHẬN DIỆN
+  // =====================================================
 
-    img.Image? decoded = img.decodeImage(bytes);
-    if (decoded == null) throw StateError('Không đọc được ảnh.');
-    decoded = img.bakeOrientation(decoded);
-
-    final inputShape = _interpreter!.getInputTensor(0).shape;
-    if (inputShape.length != 4 || inputShape[0] != 1 || inputShape[3] != 3) {
-      throw StateError('Input shape không hỗ trợ: $inputShape');
+  Future<RecognitionResult?> recognize(
+    Uint8List bytes,
+  ) async {
+    if (!isReady) {
+      throw StateError(
+        'AI chưa sẵn sàng.',
+      );
     }
 
-    final h = inputShape[1];
-    final w = inputShape[2];
-    final resized = img.copyResize(
+    img.Image? decoded =
+        img.decodeImage(bytes);
+
+    if (decoded == null) {
+      throw StateError(
+        'Không đọc được ảnh.',
+      );
+    }
+
+    // Sửa chiều ảnh camera theo EXIF
+    decoded =
+        img.bakeOrientation(decoded);
+
+    // ===================================================
+    // TẠO NHIỀU PHIÊN BẢN ẢNH
+    // ===================================================
+
+    final variants = <img.Image>[
+      // 1. Toàn bộ ảnh
       decoded,
-      width: w,
-      height: h,
-      interpolation: img.Interpolation.linear,
+
+      // 2. Crop nhẹ
+      _centerCrop(
+        decoded,
+        0.92,
+      ),
+
+      // 3. Crop vừa
+      _centerCrop(
+        decoded,
+        0.84,
+      ),
+
+      // 4. Crop mạnh
+      _centerCrop(
+        decoded,
+        0.76,
+      ),
+
+      // 5. Loại bớt thanh menu/viền
+      // khi chụp màn hình máy tính
+      _screenCrop(
+        decoded,
+      ),
+    ];
+
+    RecognitionResult? bestResult;
+
+    // ===================================================
+    // CHẠY AI CHO TỪNG PHIÊN BẢN
+    // ===================================================
+
+    for (var i = 0;
+        i < variants.length;
+        i++) {
+      final query =
+          _getEmbedding(
+        variants[i],
+      );
+
+      final result =
+          _compareEmbedding(
+        query,
+      );
+
+      print(
+        'Variant $i: '
+        '${result.label} '
+        '${(result.similarity * 100).toStringAsFixed(1)}%',
+      );
+
+      if (bestResult == null ||
+          result.similarity >
+              bestResult.similarity) {
+        bestResult = result;
+      }
+    }
+
+    if (bestResult == null) {
+      return null;
+    }
+
+    print(
+      'BEST = '
+      '${bestResult.label} '
+      '${(bestResult.similarity * 100).toStringAsFixed(1)}%',
     );
 
-    final flat = Float32List(w * h * 3);
-    var offset = 0;
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++) {
-        final p = resized.getPixel(x, y);
-        flat[offset++] = p.r.toDouble();
-        flat[offset++] = p.g.toDouble();
-        flat[offset++] = p.b.toDouble();
-      }
+    // ===================================================
+    // GIỮ NGƯỠNG 75%
+    // ===================================================
+
+    if (bestResult.similarity <
+        _threshold) {
+      return null;
     }
 
-    final input = flat.reshape([1, h, w, 3]);
-    final outDim = _interpreter!.getOutputTensor(0).shape.last;
-    final output = Float32List(outDim).reshape([1, outDim]);
-    _interpreter!.run(input, output);
-
-    final rawEmbedding = (output[0] as List)
-        .map((v) => (v as num).toDouble())
-        .toList(growable: false);
-    final query = _normalize(rawEmbedding);
-
-    final scored = _samples
-        .map((s) => _ScoredSample(s.label, _dot(query, s.embedding)))
-        .toList()
-      ..sort((a, b) => b.score.compareTo(a.score));
-
-    final top = scored.take(math.min(5, scored.length)).toList();
-    final counts = <String, int>{};
-    for (final item in top) {
-      counts[item.label] = (counts[item.label] ?? 0) + 1;
-    }
-
-    var winner = top.first.label;
-    var bestCount = counts[winner] ?? 0;
-    for (final item in top) {
-      final c = counts[item.label] ?? 0;
-      if (c > bestCount) {
-        winner = item.label;
-        bestCount = c;
-      }
-    }
-
-    final winnerScores = top
-        .where((e) => e.label == winner)
-        .map((e) => e.score)
-        .toList();
-    final similarity = winnerScores.reduce((a, b) => a + b) / winnerScores.length;
-
-    if (similarity < _threshold) return null;
-    return RecognitionResult(winner, similarity);
+    return bestResult;
   }
 
-  List<double> _normalize(List<double> v) {
+  // =====================================================
+  // CROP GIỮA ẢNH
+  // =====================================================
+
+  img.Image _centerCrop(
+    img.Image source,
+    double ratio,
+  ) {
+    final cropWidth =
+        (source.width * ratio).round();
+
+    final cropHeight =
+        (source.height * ratio).round();
+
+    final x =
+        ((source.width - cropWidth) / 2)
+            .round();
+
+    final y =
+        ((source.height - cropHeight) / 2)
+            .round();
+
+    return img.copyCrop(
+      source,
+      x: x,
+      y: y,
+      width: cropWidth,
+      height: cropHeight,
+    );
+  }
+
+  // =====================================================
+  // CROP DÀNH CHO ẢNH CHỤP MÀN HÌNH
+  // =====================================================
+
+  img.Image _screenCrop(
+    img.Image source,
+  ) {
+    // Bỏ khoảng 4% hai bên
+    final left =
+        (source.width * 0.04).round();
+
+    final right =
+        (source.width * 0.04).round();
+
+    // Bỏ nhiều hơn ở phía trên
+    // vì thường có thanh menu máy tính
+    final top =
+        (source.height * 0.10).round();
+
+    final bottom =
+        (source.height * 0.04).round();
+
+    final cropWidth =
+        source.width -
+        left -
+        right;
+
+    final cropHeight =
+        source.height -
+        top -
+        bottom;
+
+    return img.copyCrop(
+      source,
+      x: left,
+      y: top,
+      width: cropWidth,
+      height: cropHeight,
+    );
+  }
+
+  // =====================================================
+  // TẠO EMBEDDING
+  // =====================================================
+
+  List<double> _getEmbedding(
+    img.Image source,
+  ) {
+    final inputShape =
+        _interpreter!
+            .getInputTensor(0)
+            .shape;
+
+    if (inputShape.length != 4 ||
+        inputShape[0] != 1 ||
+        inputShape[3] != 3) {
+      throw StateError(
+        'Input shape không hỗ trợ: '
+        '$inputShape',
+      );
+    }
+
+    final h =
+        inputShape[1];
+
+    final w =
+        inputShape[2];
+
+    // Resize giống bản Python/Gradio
+    final resized =
+        img.copyResize(
+      source,
+      width: w,
+      height: h,
+      interpolation:
+          img.Interpolation.linear,
+    );
+
+    final flat =
+        Float32List(
+      w * h * 3,
+    );
+
+    var offset = 0;
+
+    for (var y = 0;
+        y < h;
+        y++) {
+      for (var x = 0;
+          x < w;
+          x++) {
+        final p =
+            resized.getPixel(
+          x,
+          y,
+        );
+
+        flat[offset++] =
+            p.r.toDouble();
+
+        flat[offset++] =
+            p.g.toDouble();
+
+        flat[offset++] =
+            p.b.toDouble();
+      }
+    }
+
+    final input =
+        flat.reshape(
+      [
+        1,
+        h,
+        w,
+        3,
+      ],
+    );
+
+    final outDim =
+        _interpreter!
+            .getOutputTensor(0)
+            .shape
+            .last;
+
+    final output =
+        Float32List(outDim)
+            .reshape(
+      [
+        1,
+        outDim,
+      ],
+    );
+
+    _interpreter!.run(
+      input,
+      output,
+    );
+
+    final rawEmbedding =
+        (output[0] as List)
+            .map(
+              (v) =>
+                  (v as num).toDouble(),
+            )
+            .toList(
+              growable: false,
+            );
+
+    return _normalize(
+      rawEmbedding,
+    );
+  }
+
+  // =====================================================
+  // SO SÁNH DATABASE - TOP 5
+  // =====================================================
+
+  RecognitionResult _compareEmbedding(
+    List<double> query,
+  ) {
+    final scored =
+        _samples
+            .map(
+              (s) =>
+                  _ScoredSample(
+                s.label,
+                _dot(
+                  query,
+                  s.embedding,
+                ),
+              ),
+            )
+            .toList()
+          ..sort(
+            (a, b) =>
+                b.score.compareTo(
+              a.score,
+            ),
+          );
+
+    final top =
+        scored
+            .take(
+              math.min(
+                5,
+                scored.length,
+              ),
+            )
+            .toList();
+
+    // ===================================================
+    // ĐẾM PHIẾU TOP 5
+    // ===================================================
+
+    final counts =
+        <String, int>{};
+
+    for (final item in top) {
+      counts[item.label] =
+          (counts[item.label] ?? 0) +
+              1;
+    }
+
+    var winner =
+        top.first.label;
+
+    var bestCount =
+        counts[winner] ?? 0;
+
+    for (final item in top) {
+      final count =
+          counts[item.label] ?? 0;
+
+      if (count > bestCount) {
+        winner =
+            item.label;
+
+        bestCount =
+            count;
+      }
+    }
+
+    // ===================================================
+    // TÍNH ĐỘ TƯƠNG ĐỒNG TRUNG BÌNH
+    // ===================================================
+
+    final winnerScores =
+        top
+            .where(
+              (e) =>
+                  e.label == winner,
+            )
+            .map(
+              (e) =>
+                  e.score,
+            )
+            .toList();
+
+    final similarity =
+        winnerScores.reduce(
+              (a, b) =>
+                  a + b,
+            ) /
+            winnerScores.length;
+
+    return RecognitionResult(
+      winner,
+      similarity,
+    );
+  }
+
+  // =====================================================
+  // NORMALIZE
+  // =====================================================
+
+  List<double> _normalize(
+    List<double> v,
+  ) {
     var sumSq = 0.0;
+
     for (final x in v) {
       sumSq += x * x;
     }
-    final norm = math.sqrt(sumSq) + 1e-10;
-    return v.map((x) => x / norm).toList(growable: false);
+
+    final norm =
+        math.sqrt(sumSq) +
+            1e-10;
+
+    return v
+        .map(
+          (x) =>
+              x / norm,
+        )
+        .toList(
+          growable: false,
+        );
   }
 
-  double _dot(List<double> a, List<double> b) {
-    final n = math.min(a.length, b.length);
+  // =====================================================
+  // COSINE SIMILARITY
+  // =====================================================
+
+  double _dot(
+    List<double> a,
+    List<double> b,
+  ) {
+    final n =
+        math.min(
+      a.length,
+      b.length,
+    );
+
     var s = 0.0;
-    for (var i = 0; i < n; i++) {
-      s += a[i] * b[i];
+
+    for (var i = 0;
+        i < n;
+        i++) {
+      s +=
+          a[i] * b[i];
     }
-    return s.clamp(-1.0, 1.0).toDouble();
+
+    return s
+        .clamp(
+          -1.0,
+          1.0,
+        )
+        .toDouble();
   }
+
+  // =====================================================
+  // ĐÓNG MODEL
+  // =====================================================
 
   void dispose() {
     _interpreter?.close();
+
     _interpreter = null;
   }
 }
