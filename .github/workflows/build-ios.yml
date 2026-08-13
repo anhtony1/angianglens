@@ -51,7 +51,11 @@ jobs:
       # 6. Tải các package Flutter
       - name: Flutter pub get
         run: flutter pub get
-
+        
+      - name: Generate app icons
+        run: |
+          dart run flutter_launcher_icons
+          
       # 7. Build ứng dụng iOS KHÔNG KÝ
       - name: Build iOS unsigned
         run: |
