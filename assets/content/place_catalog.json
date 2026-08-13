@@ -16,7 +16,7 @@
 
   "ho_PT": {
     "name": "Hòn Phụ Tử",
-    "location": "Kiên Lương, Kiên Giang",
+    "location": "Kiên Lương, An Giang",
     "icon": "🌊",
     "description": "Hòn Phụ Tử là một thắng cảnh nổi bật của vùng biển Kiên Lương. Điểm đặc trưng của nơi đây là những khối đá vôi vươn lên giữa mặt biển, tạo nên cảnh quan độc đáo và dễ nhận biết. Khu vực xung quanh còn có bãi biển, núi đá và các điểm tham quan văn hóa, tạo thành một quần thể du lịch hấp dẫn. Hòn Phụ Tử không chỉ có giá trị về cảnh quan thiên nhiên mà còn gắn với câu chuyện dân gian về tình cảm cha con. Đây là một địa điểm thích hợp để tham quan, chụp ảnh và tìm hiểu thêm về vẻ đẹp thiên nhiên vùng biển phía Tây Nam.",
     "videoUrl": "",
@@ -30,9 +30,9 @@
 
   "den_NTT": {
     "name": "Đền thờ Nguyễn Trung Trực",
-    "location": "Rạch Giá, Kiên Giang",
+    "location": "Rạch Giá, An Giang",
     "icon": "🏯",
-    "description": "Đền thờ Nguyễn Trung Trực là một địa điểm lịch sử và văn hóa tiêu biểu gắn với anh hùng dân tộc Nguyễn Trung Trực. Không gian đền mang vẻ trang nghiêm, là nơi người dân và du khách đến tưởng niệm, tìm hiểu về cuộc đời, tinh thần yêu nước và những đóng góp của ông trong lịch sử. Kiến trúc truyền thống cùng các khu vực thờ tự tạo nên nét đặc trưng riêng cho công trình. Địa điểm này vừa có ý nghĩa giáo dục truyền thống, vừa là điểm tham quan văn hóa quan trọng đối với du khách khi tìm hiểu về vùng đất Kiên Giang.",
+    "description": "Đền thờ Nguyễn Trung Trực là một địa điểm lịch sử và văn hóa tiêu biểu gắn với anh hùng dân tộc Nguyễn Trung Trực. Không gian đền mang vẻ trang nghiêm, là nơi người dân và du khách đến tưởng niệm, tìm hiểu về cuộc đời, tinh thần yêu nước và những đóng góp của ông trong lịch sử. Kiến trúc truyền thống cùng các khu vực thờ tự tạo nên nét đặc trưng riêng cho công trình. Địa điểm này vừa có ý nghĩa giáo dục truyền thống, vừa là điểm tham quan văn hóa quan trọng đối với du khách khi tìm hiểu về vùng đất An Giang.",
     "videoUrl": "",
     "images": [
       "assets/places/den_NTT/01.jpg",
@@ -44,7 +44,7 @@
 
   "Phu_quoc": {
     "name": "Phú Quốc",
-    "location": "Phú Quốc, Kiên Giang",
+    "location": "Phú Quốc, An Giang",
     "icon": "🏝️",
     "description": "Phú Quốc là hòn đảo nổi tiếng với cảnh quan biển, bãi cát, rừng và nhiều địa điểm văn hóa, du lịch đặc sắc. Không gian thiên nhiên đa dạng cùng hệ thống dịch vụ du lịch phát triển giúp Phú Quốc trở thành một điểm đến hấp dẫn đối với du khách trong và ngoài nước. Bên cạnh các bãi biển, du khách còn có thể khám phá những công trình văn hóa, làng nghề và các địa điểm gắn với đời sống cư dân trên đảo. Phú Quốc là một điểm đến tiêu biểu cho vẻ đẹp biển đảo của khu vực Tây Nam Bộ.",
     "videoUrl": "",
@@ -59,7 +59,7 @@
 
   "Thach_Dong": {
     "name": "Thạch Động",
-    "location": "Hà Tiên, Kiên Giang",
+    "location": "Hà Tiên, An Giang",
     "icon": "⛰️",
     "description": "Thạch Động là một thắng cảnh nổi bật tại Hà Tiên với khối núi đá vôi có hình dáng đặc trưng. Bên trong núi có hệ thống hang động tự nhiên tạo nên không gian độc đáo, kết hợp giữa cảnh quan địa chất và yếu tố văn hóa, tín ngưỡng. Từ khu vực Thạch Động, du khách có thể quan sát cảnh quan đồng bằng và khu vực xung quanh. Với hình dáng dễ nhận biết và giá trị về thiên nhiên, lịch sử, văn hóa, Thạch Động là một trong những điểm tham quan đáng chú ý khi khám phá Hà Tiên.",
     "videoUrl": "",
