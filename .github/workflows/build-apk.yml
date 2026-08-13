@@ -59,7 +59,11 @@ jobs:
       - name: Tai thu vien
         working-directory: build_app
         run: flutter pub get
-
+        
+      - name: Tao icon APK
+        working-directory: build_app
+        run: dart run flutter_launcher_icons
+        
       - name: Sua loi Java Kotlin TFLite
         working-directory: build_app
         run: |
