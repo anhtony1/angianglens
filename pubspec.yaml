@@ -28,4 +28,11 @@ flutter:
     - assets/ai/angiang_lens_model.tflite
     - assets/ai/angiang_lens_database.json
     - assets/content/place_catalog.json
-    - assets/places/
+    - assets/places/Mieu_bcx/
+    - assets/places/ho_PT/
+    - assets/places/den_NTT/
+    - assets/places/Phu_quoc/
+    - assets/places/Thach_Dong/
+    - assets/places/Chua_Ta_Pa/
+    - assets/places/Tra_Su/
+    - assets/places/Nui_Cam/
