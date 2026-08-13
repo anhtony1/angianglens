@@ -23,7 +23,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
   assets:
     - assets/ai/angiang_lens_model.tflite
     - assets/ai/angiang_lens_database.json
     - assets/content/place_catalog.json
+    - assets/places/
