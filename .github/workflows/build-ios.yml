@@ -1,0 +1,103 @@
+name: Build iOS IPA
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Build AnGiang Lens IPA
+    runs-on: macos-latest
+
+    steps:
+      # 1. Lấy source code
+      - name: Checkout source
+        uses: actions/checkout@v7
+
+      # 2. Cài Flutter
+      - name: Install Flutter
+        run: |
+          git clone https://github.com/flutter/flutter.git \
+            --depth 1 \
+            --branch 3.47.0 \
+            $HOME/flutter
+
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+
+      # 3. Kiểm tra môi trường
+      - name: Check environment
+        run: |
+          flutter --version
+          xcodebuild -version
+          pod --version
+
+      # 4. Nếu project chưa có thư mục ios thì tự tạo
+      - name: Ensure iOS project exists
+        run: |
+          if [ ! -d "ios" ]; then
+            flutter create --platforms=ios .
+          fi
+
+      # 5. Thêm quyền Camera cho AnGiang Lens
+      - name: Add iOS Camera Permission
+        run: |
+          /usr/libexec/PlistBuddy \
+            -c "Delete :NSCameraUsageDescription" \
+            ios/Runner/Info.plist || true
+
+          /usr/libexec/PlistBuddy \
+            -c "Add :NSCameraUsageDescription string 'AnGiang Lens sử dụng camera để nhận diện địa điểm du lịch.'" \
+            ios/Runner/Info.plist
+
+      # 6. Tải các package Flutter
+      - name: Flutter pub get
+        run: flutter pub get
+
+      # 7. Build ứng dụng iOS KHÔNG KÝ
+      - name: Build iOS unsigned
+        run: |
+          flutter build ios \
+            --release \
+            --no-codesign
+
+      # 8. Kiểm tra Runner.app
+      - name: Check Runner.app
+        run: |
+          if [ ! -d "build/ios/iphoneos/Runner.app" ]; then
+            echo "Runner.app not found!"
+            exit 1
+          fi
+
+          echo "Runner.app created successfully"
+          du -sh build/ios/iphoneos/Runner.app
+
+      # 9. Đóng gói thành IPA
+      - name: Create IPA
+        run: |
+          rm -rf Payload
+          rm -f AnGiangLens.ipa
+
+          mkdir Payload
+
+          cp -R \
+            build/ios/iphoneos/Runner.app \
+            Payload/
+
+          ditto \
+            -c \
+            -k \
+            --sequesterRsrc \
+            --keepParent \
+            Payload \
+            AnGiangLens.ipa
+
+          echo "IPA created:"
+          ls -lh AnGiangLens.ipa
+
+      # 10. Upload IPA lên GitHub
+      - name: Upload IPA
+        uses: actions/upload-artifact@v7
+        with:
+          name: AnGiangLens-iOS
+          path: AnGiangLens.ipa
+          if-no-files-found: error
+          retention-days: 7
