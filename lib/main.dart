@@ -805,14 +805,31 @@ class _ScannerPageState extends State<ScannerPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('🏞️', style: TextStyle(fontSize: 44)),
-                  Text(
-                    'AnGiang Lens',
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
+                  Row(
+  children: [
+    ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: Image.asset(
+        'assets/icon/app_icon.png',
+        width: 70,
+        height: 70,
+        fit: BoxFit.cover,
+      ),
+    ),
+
+    const SizedBox(width: 14),
+
+    Expanded(
+      child: Text(
+        'AnGiang Lens',
+        style: theme.textTheme.headlineMedium?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    ),
+  ],
+),
                   const SizedBox(height: 6),
                   const Text(
                     'Khám phá An Giang qua trí tuệ nhân tạo',
