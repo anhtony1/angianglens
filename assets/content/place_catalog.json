@@ -3,16 +3,117 @@
     "name": "Miếu Bà Chúa Xứ Núi Sam",
     "location": "Núi Sam, An Giang",
     "icon": "🏛️",
-    "description": "Miếu Bà Chúa Xứ Núi Sam là một địa điểm văn hóa, tín ngưỡng và du lịch nổi tiếng của An Giang. Nơi đây thu hút đông đảo người dân và du khách đến tham quan, hành hương và tìm hiểu các giá trị văn hóa địa phương.",
+    "description": "Miếu Bà Chúa Xứ Núi Sam là một địa điểm văn hóa, tín ngưỡng nổi tiếng của An Giang. Công trình nằm dưới chân Núi Sam và từ lâu đã trở thành điểm hành hương, tham quan quen thuộc của người dân và du khách. Không gian miếu nổi bật với kiến trúc trang nghiêm, các chi tiết trang trí mang đậm nét văn hóa truyền thống. Khi đến đây, du khách không chỉ tìm hiểu về đời sống tín ngưỡng của cư dân địa phương mà còn có thể khám phá nhiều di tích và thắng cảnh xung quanh khu vực Núi Sam. Đây là một trong những địa điểm tiêu biểu góp phần tạo nên bản sắc văn hóa và du lịch của An Giang.",
     "videoUrl": "",
-    "images": []
+    "images": [
+      "assets/places/Mieu_bcx/01.jpeg",
+      "assets/places/Mieu_bcx/02.jpg",
+      "assets/places/Mieu_bcx/03.jpg",
+      "assets/places/Mieu_bcx/04.jpg",
+      "assets/places/Mieu_bcx/05.jpg"
+    ]
   },
+
   "ho_PT": {
     "name": "Hòn Phụ Tử",
-    "location": "An Giang",
+    "location": "Kiên Lương, Kiên Giang",
     "icon": "🌊",
-    "description": "Hòn Phụ Tử là một thắng cảnh nổi tiếng với cảnh quan thiên nhiên đặc sắc. Địa danh gắn với những câu chuyện văn hóa dân gian và là một điểm tham quan tiêu biểu khi khám phá du lịch An Giang.",
+    "description": "Hòn Phụ Tử là một thắng cảnh nổi bật của vùng biển Kiên Lương. Điểm đặc trưng của nơi đây là những khối đá vôi vươn lên giữa mặt biển, tạo nên cảnh quan độc đáo và dễ nhận biết. Khu vực xung quanh còn có bãi biển, núi đá và các điểm tham quan văn hóa, tạo thành một quần thể du lịch hấp dẫn. Hòn Phụ Tử không chỉ có giá trị về cảnh quan thiên nhiên mà còn gắn với câu chuyện dân gian về tình cảm cha con. Đây là một địa điểm thích hợp để tham quan, chụp ảnh và tìm hiểu thêm về vẻ đẹp thiên nhiên vùng biển phía Tây Nam.",
     "videoUrl": "",
-    "images": []
+    "images": [
+      "assets/places/ho_PT/01.jpeg",
+      "assets/places/ho_PT/02.jpg",
+      "assets/places/ho_PT/03.jpg",
+      "assets/places/ho_PT/04.jpg"
+    ]
+  },
+
+  "den_NTT": {
+    "name": "Đền thờ Nguyễn Trung Trực",
+    "location": "Rạch Giá, Kiên Giang",
+    "icon": "🏯",
+    "description": "Đền thờ Nguyễn Trung Trực là một địa điểm lịch sử và văn hóa tiêu biểu gắn với anh hùng dân tộc Nguyễn Trung Trực. Không gian đền mang vẻ trang nghiêm, là nơi người dân và du khách đến tưởng niệm, tìm hiểu về cuộc đời, tinh thần yêu nước và những đóng góp của ông trong lịch sử. Kiến trúc truyền thống cùng các khu vực thờ tự tạo nên nét đặc trưng riêng cho công trình. Địa điểm này vừa có ý nghĩa giáo dục truyền thống, vừa là điểm tham quan văn hóa quan trọng đối với du khách khi tìm hiểu về vùng đất Kiên Giang.",
+    "videoUrl": "",
+    "images": [
+      "assets/places/den_NTT/01.jpg",
+      "assets/places/den_NTT/02.jpg",
+      "assets/places/den_NTT/03.jpg",
+      "assets/places/den_NTT/04.jpg"
+    ]
+  },
+
+  "Phu_quoc": {
+    "name": "Phú Quốc",
+    "location": "Phú Quốc, Kiên Giang",
+    "icon": "🏝️",
+    "description": "Phú Quốc là hòn đảo nổi tiếng với cảnh quan biển, bãi cát, rừng và nhiều địa điểm văn hóa, du lịch đặc sắc. Không gian thiên nhiên đa dạng cùng hệ thống dịch vụ du lịch phát triển giúp Phú Quốc trở thành một điểm đến hấp dẫn đối với du khách trong và ngoài nước. Bên cạnh các bãi biển, du khách còn có thể khám phá những công trình văn hóa, làng nghề và các địa điểm gắn với đời sống cư dân trên đảo. Phú Quốc là một điểm đến tiêu biểu cho vẻ đẹp biển đảo của khu vực Tây Nam Bộ.",
+    "videoUrl": "",
+    "images": [
+      "assets/places/Phu_quoc/01.jpg",
+      "assets/places/Phu_quoc/02.jpeg",
+      "assets/places/Phu_quoc/03.jpg",
+      "assets/places/Phu_quoc/04.jpeg",
+      "assets/places/Phu_quoc/05.jpg"
+    ]
+  },
+
+  "Thach_Dong": {
+    "name": "Thạch Động",
+    "location": "Hà Tiên, Kiên Giang",
+    "icon": "⛰️",
+    "description": "Thạch Động là một thắng cảnh nổi bật tại Hà Tiên với khối núi đá vôi có hình dáng đặc trưng. Bên trong núi có hệ thống hang động tự nhiên tạo nên không gian độc đáo, kết hợp giữa cảnh quan địa chất và yếu tố văn hóa, tín ngưỡng. Từ khu vực Thạch Động, du khách có thể quan sát cảnh quan đồng bằng và khu vực xung quanh. Với hình dáng dễ nhận biết và giá trị về thiên nhiên, lịch sử, văn hóa, Thạch Động là một trong những điểm tham quan đáng chú ý khi khám phá Hà Tiên.",
+    "videoUrl": "",
+    "images": [
+      "assets/places/Thach_Dong/01.jpeg",
+      "assets/places/Thach_Dong/02.jpeg",
+      "assets/places/Thach_Dong/03.jpg",
+      "assets/places/Thach_Dong/04.jpeg",
+      "assets/places/Thach_Dong/05.webp"
+    ]
+  },
+
+  "Chua_Ta_Pa": {
+    "name": "Chùa Tà Pạ",
+    "location": "Tri Tôn, An Giang",
+    "icon": "🛕",
+    "description": "Chùa Tà Pạ là một ngôi chùa mang đậm nét kiến trúc và văn hóa Khmer tại vùng Tri Tôn. Công trình nổi bật với màu sắc, mái chùa, hoa văn và các chi tiết trang trí đặc trưng. Chùa nằm trong không gian thiên nhiên yên tĩnh, tạo nên sự hài hòa giữa kiến trúc tôn giáo và cảnh quan vùng núi. Đây không chỉ là nơi sinh hoạt tín ngưỡng mà còn là điểm tham quan giúp du khách tìm hiểu thêm về văn hóa của cộng đồng Khmer ở An Giang. Những nét kiến trúc đặc trưng cũng giúp Chùa Tà Pạ trở thành một địa điểm phù hợp cho hệ thống nhận diện hình ảnh của AnGiang Lens.",
+    "videoUrl": "",
+    "images": [
+      "assets/places/Chua_Ta_Pa/01.jpeg",
+      "assets/places/Chua_Ta_Pa/02.jpg",
+      "assets/places/Chua_Ta_Pa/03.jpg",
+      "assets/places/Chua_Ta_Pa/04.jpeg",
+      "assets/places/Chua_Ta_Pa/05.jpeg"
+    ]
+  },
+
+  "Tra_Su": {
+    "name": "Rừng tràm Trà Sư",
+    "location": "Tịnh Biên, An Giang",
+    "icon": "🌿",
+    "description": "Rừng tràm Trà Sư là điểm du lịch sinh thái nổi bật của An Giang. Nơi đây gây ấn tượng với những cánh rừng tràm xanh, hệ thống kênh rạch và cảnh quan đặc trưng của vùng đất ngập nước. Du khách có thể trải nghiệm không gian thiên nhiên bằng xuồng, quan sát thảm thực vật và nhiều loài chim, động vật sinh sống trong khu vực. Màu xanh của rừng tràm kết hợp với mặt nước tạo nên cảnh quan rất đặc trưng. Trà Sư vừa có giá trị về du lịch sinh thái vừa góp phần giới thiệu sự đa dạng của môi trường tự nhiên vùng Tây Nam Bộ.",
+    "videoUrl": "",
+    "images": [
+      "assets/places/Tra_Su/01.jpg",
+      "assets/places/Tra_Su/02.jpg",
+      "assets/places/Tra_Su/03.jpeg",
+      "assets/places/Tra_Su/04.jpeg",
+      "assets/places/Tra_Su/05.jpg"
+    ]
+  },
+
+  "Nui_Cam": {
+    "name": "Núi Cấm",
+    "location": "Tịnh Biên, An Giang",
+    "icon": "⛰️",
+    "description": "Núi Cấm là một địa điểm du lịch nổi bật trong vùng Thất Sơn của An Giang. Khu vực có địa hình núi cao, khí hậu tương đối mát mẻ và nhiều cảnh quan thiên nhiên đẹp. Trên núi có các công trình văn hóa, tín ngưỡng và những điểm tham quan tạo nên nét đặc trưng cho du lịch địa phương. Du khách có thể khám phá cảnh quan núi rừng, ngắm nhìn khu vực đồng bằng từ trên cao và tìm hiểu đời sống văn hóa của vùng Bảy Núi. Với nhiều đặc điểm hình ảnh nổi bật, Núi Cấm là một trong những địa điểm phù hợp để giới thiệu bằng công nghệ nhận diện của AnGiang Lens.",
+    "videoUrl": "",
+    "images": [
+      "assets/places/Nui_Cam/01.jpg",
+      "assets/places/Nui_Cam/02.jpg",
+      "assets/places/Nui_Cam/03.jpg",
+      "assets/places/Nui_Cam/04.jpg",
+      "assets/places/Nui_Cam/05.jpeg"
+    ]
   }
 }
