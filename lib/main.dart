@@ -947,7 +947,7 @@ class _ScannerPageState extends State<ScannerPage> {
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Ảnh không đủ giống Miếu Bà Chúa Xứ hoặc Hòn Phụ Tử sẽ bị từ chối, thay vì ép chọn sai địa điểm.',
+                      'AI nhận diện các địa điểm đã được tích hợp trong AnGiang Lens. Ảnh không đạt ngưỡng tương đồng sẽ được từ chối để hạn chế nhận diện sai.',
                       style: TextStyle(color: Color(0xFF245B4B), height: 1.45),
                     ),
                   ),
@@ -1031,12 +1031,19 @@ class PlaceDetailsPage extends StatefulWidget {
   });
 
   @override
-  State<PlaceDetailsPage> createState() => _PlaceDetailsPageState();
+  State<PlaceDetailsPage> createState() =>
+      _PlaceDetailsPageState();
 }
 
-class _PlaceDetailsPageState extends State<PlaceDetailsPage> {
+class _PlaceDetailsPageState
+    extends State<PlaceDetailsPage> {
   final FlutterTts _tts = FlutterTts();
+
+  final PageController _galleryController =
+      PageController();
+
   bool _speaking = false;
+  int _currentImage = 0;
 
   @override
   void initState() {
@@ -1048,38 +1055,74 @@ class _PlaceDetailsPageState extends State<PlaceDetailsPage> {
     await _tts.setLanguage('vi-VN');
     await _tts.setSpeechRate(0.45);
     await _tts.setPitch(1.0);
+
     _tts.setCompletionHandler(() {
-      if (mounted) setState(() => _speaking = false);
+      if (mounted) {
+        setState(() => _speaking = false);
+      }
     });
+
     _tts.setCancelHandler(() {
-      if (mounted) setState(() => _speaking = false);
+      if (mounted) {
+        setState(() => _speaking = false);
+      }
     });
   }
 
   Future<void> _toggleSpeech() async {
     if (_speaking) {
       await _tts.stop();
-      if (mounted) setState(() => _speaking = false);
+
+      if (mounted) {
+        setState(() => _speaking = false);
+      }
+
       return;
     }
-    if (mounted) setState(() => _speaking = true);
-    await _tts.speak('${widget.place.name}. ${widget.place.description}');
+
+    if (mounted) {
+      setState(() => _speaking = true);
+    }
+
+    await _tts.speak(
+      '${widget.place.name}. '
+      '${widget.place.description}',
+    );
   }
 
   Future<void> _openVideo() async {
-    final value = widget.place.videoUrl.trim();
+    final value =
+        widget.place.videoUrl.trim();
+
     if (value.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Chưa thêm video cho địa điểm này.')),
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Chưa thêm video cho địa điểm này.',
+          ),
+        ),
       );
+
       return;
     }
-    final uri = Uri.tryParse(value);
-    if (uri == null || !await launchUrl(uri)) {
+
+    final uri =
+        Uri.tryParse(value);
+
+    if (uri == null ||
+        !await launchUrl(uri)) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không mở được video.')),
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Không mở được video.',
+          ),
+        ),
       );
     }
   }
@@ -1087,139 +1130,515 @@ class _PlaceDetailsPageState extends State<PlaceDetailsPage> {
   @override
   void dispose() {
     _tts.stop();
+    _galleryController.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final pct = (widget.result.similarity * 100).clamp(0, 100);
+    final theme =
+        Theme.of(context);
+
+    final pct =
+        (widget.result.similarity * 100)
+            .clamp(0, 100);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('AnGiang Lens')),
+      appBar: AppBar(
+        title: const Text(
+          'AnGiang Lens',
+        ),
+      ),
+
       body: ListView(
         padding: EdgeInsets.zero,
+
         children: [
+
+          // ============================================
+          // ẢNH VỪA QUÉT + TÊN ĐỊA ĐIỂM
+          // ============================================
+
           Stack(
-            alignment: Alignment.bottomLeft,
+            alignment:
+                Alignment.bottomLeft,
+
             children: [
+
               AspectRatio(
                 aspectRatio: 16 / 10,
+
                 child: Image.file(
-                  File(widget.scannedImagePath),
+                  File(
+                    widget.scannedImagePath,
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
+
               Container(
                 height: 150,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Color(0xCC063D32)],
+
+                decoration:
+                    const BoxDecoration(
+                  gradient:
+                      LinearGradient(
+                    begin:
+                        Alignment.topCenter,
+                    end:
+                        Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Color(0xCC063D32),
+                    ],
                   ),
                 ),
               ),
+
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding:
+                    const EdgeInsets.all(20),
+
                 child: Text(
-                  '${widget.place.icon}  ${widget.place.name}',
-                  style: theme.textTheme.headlineSmall?.copyWith(
+                  '${widget.place.icon}  '
+                  '${widget.place.name}',
+
+                  style: theme
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(
                     color: Colors.white,
-                    fontWeight: FontWeight.w800,
+                    fontWeight:
+                        FontWeight.w800,
                   ),
                 ),
               ),
             ],
           ),
+
           Padding(
-            padding: const EdgeInsets.fromLTRB(18, 18, 18, 28),
+            padding:
+                const EdgeInsets.fromLTRB(
+              18,
+              18,
+              18,
+              28,
+            ),
+
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+
               children: [
+
+                // =====================================
+                // VỊ TRÍ + ĐỘ TƯƠNG ĐỒNG
+                // =====================================
+
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
+
                   children: [
-                    pill(Icons.location_on_outlined, widget.place.location),
-                    pill(Icons.auto_awesome, 'AI tương đồng ${pct.toStringAsFixed(1)}%'),
+                    pill(
+                      Icons.location_on_outlined,
+                      widget.place.location,
+                    ),
+
+                    pill(
+                      Icons.auto_awesome,
+                      'AI tương đồng '
+                      '${pct.toStringAsFixed(1)}%',
+                    ),
                   ],
                 ),
+
                 const SizedBox(height: 22),
+
+                // =====================================
+                // BÀI THUYẾT MINH
+                // =====================================
+
                 cardSection(
                   '📖 Giới thiệu',
+
                   Text(
                     widget.place.description,
-                    style: theme.textTheme.bodyLarge?.copyWith(
+
+                    style: theme
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(
                       height: 1.65,
-                      color: const Color(0xFF334155),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: _toggleSpeech,
-                    icon: Icon(_speaking ? Icons.stop_circle : Icons.volume_up),
-                    label: Text(_speaking ? 'Dừng thuyết minh' : 'Nghe thuyết minh'),
-                  ),
-                ),
-                const SizedBox(height: 22),
-                Text(
-                  '🖼 Hình ảnh địa điểm',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFF12372E),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                if (widget.place.images.isEmpty)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFFDCE7E2)),
-                    ),
-                    child: const Text(
-                      'Bản demo dùng ảnh vừa quét làm ảnh đại diện. Khi bạn gửi thêm ảnh địa điểm, có thể đưa chúng vào thư viện offline.',
-                    ),
-                  )
-                else
-                  SizedBox(
-                    height: 140,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: widget.place.images.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 10),
-                      itemBuilder: (context, index) => ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.asset(
-                          widget.place.images[index],
-                          width: 190,
-                          fit: BoxFit.cover,
-                        ),
+                      color:
+                          const Color(
+                        0xFF334155,
                       ),
                     ),
                   ),
-                const SizedBox(height: 22),
+                ),
+
+                const SizedBox(height: 14),
+
+                // =====================================
+                // NGHE THUYẾT MINH
+                // =====================================
+
                 SizedBox(
                   width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: _openVideo,
-                    icon: const Icon(Icons.play_circle_outline),
-                    label: const Text('Xem video giới thiệu'),
+
+                  height: 54,
+
+                  child: FilledButton.icon(
+                    onPressed:
+                        _toggleSpeech,
+
+                    icon: Icon(
+                      _speaking
+                          ? Icons.stop_circle
+                          : Icons.volume_up,
+                    ),
+
+                    label: Text(
+                      _speaking
+                          ? 'Dừng thuyết minh'
+                          : 'Nghe thuyết minh',
+                    ),
                   ),
                 ),
+
+                const SizedBox(height: 26),
+
+                // =====================================
+                // THƯ VIỆN ẢNH
+                // =====================================
+
+                Text(
+                  '🖼 Hình ảnh địa điểm',
+
+                  style: theme
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(
+                    fontWeight:
+                        FontWeight.w800,
+                    color:
+                        const Color(
+                      0xFF12372E,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                const Text(
+                  'Vuốt sang trái hoặc phải để xem thêm ảnh',
+
+                  style: TextStyle(
+                    color:
+                        Color(0xFF64748B),
+                  ),
+                ),
+
                 const SizedBox(height: 12),
+
+                if (widget
+                    .place.images.isEmpty)
+
+                  Container(
+                    width: double.infinity,
+
+                    padding:
+                        const EdgeInsets.all(
+                      18,
+                    ),
+
+                    decoration:
+                        BoxDecoration(
+                      color: Colors.white,
+
+                      borderRadius:
+                          BorderRadius.circular(
+                        20,
+                      ),
+
+                      border: Border.all(
+                        color:
+                            const Color(
+                          0xFFDCE7E2,
+                        ),
+                      ),
+                    ),
+
+                    child: const Text(
+                      'Chưa có hình ảnh cho địa điểm này.',
+                    ),
+                  )
+
+                else ...[
+
+                  // ================================
+                  // KHUNG ẢNH LỚN
+                  // ================================
+
+                  Container(
+                    height: 250,
+
+                    decoration:
+                        BoxDecoration(
+                      color:
+                          const Color(
+                        0xFFE5F0EC,
+                      ),
+
+                      borderRadius:
+                          BorderRadius.circular(
+                        22,
+                      ),
+
+                      boxShadow: const [
+                        BoxShadow(
+                          color:
+                              Color(
+                            0x18000000,
+                          ),
+                          blurRadius: 18,
+                          offset:
+                              Offset(
+                            0,
+                            8,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    clipBehavior:
+                        Clip.antiAlias,
+
+                    child: PageView.builder(
+                      controller:
+                          _galleryController,
+
+                      itemCount: widget
+                          .place
+                          .images
+                          .length,
+
+                      onPageChanged:
+                          (index) {
+                        setState(() {
+                          _currentImage =
+                              index;
+                        });
+                      },
+
+                      itemBuilder:
+                          (
+                        context,
+                        index,
+                      ) {
+
+                        return Image.asset(
+                          widget
+                              .place
+                              .images[index],
+
+                          width:
+                              double.infinity,
+
+                          fit:
+                              BoxFit.cover,
+
+                          errorBuilder:
+                              (
+                            context,
+                            error,
+                            stackTrace,
+                          ) {
+
+                            return Container(
+                              color:
+                                  const Color(
+                                0xFFE5F0EC,
+                              ),
+
+                              child:
+                                  const Center(
+                                child:
+                                    Column(
+                                  mainAxisSize:
+                                      MainAxisSize
+                                          .min,
+                                  children: [
+                                    Icon(
+                                      Icons
+                                          .broken_image_outlined,
+                                      size: 52,
+                                      color:
+                                          Color(
+                                        0xFF64748B,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 8,
+                                    ),
+                                    Text(
+                                      'Không tải được ảnh',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // ================================
+                  // SỐ ẢNH
+                  // ================================
+
+                  Center(
+                    child: Text(
+                      '${_currentImage + 1}'
+                      ' / '
+                      '${widget.place.images.length}',
+
+                      style:
+                          const TextStyle(
+                        color:
+                            Color(
+                          0xFF64748B,
+                        ),
+                        fontWeight:
+                            FontWeight.w600,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // ================================
+                  // CHẤM TRANG
+                  // ================================
+
+                  Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.center,
+
+                    children:
+                        List.generate(
+                      widget
+                          .place
+                          .images
+                          .length,
+
+                      (index) {
+                        final active =
+                            index ==
+                                _currentImage;
+
+                        return AnimatedContainer(
+                          duration:
+                              const Duration(
+                            milliseconds:
+                                200,
+                          ),
+
+                          margin:
+                              const EdgeInsets
+                                  .symmetric(
+                            horizontal: 4,
+                          ),
+
+                          width:
+                              active
+                                  ? 22
+                                  : 8,
+
+                          height: 8,
+
+                          decoration:
+                              BoxDecoration(
+                            color: active
+                                ? const Color(
+                                    0xFF087F5B,
+                                  )
+                                : const Color(
+                                    0xFFC9D8D2,
+                                  ),
+
+                            borderRadius:
+                                BorderRadius
+                                    .circular(
+                              999,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 28),
+
+                // =====================================
+                // VIDEO
+                // =====================================
+
                 SizedBox(
                   width: double.infinity,
-                  child: FilledButton.tonalIcon(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.camera_alt_outlined),
-                    label: const Text('Quét địa điểm khác'),
+
+                  height: 54,
+
+                  child:
+                      OutlinedButton.icon(
+                    onPressed:
+                        _openVideo,
+
+                    icon: const Icon(
+                      Icons
+                          .play_circle_outline,
+                    ),
+
+                    label:
+                        const Text(
+                      'Xem video giới thiệu',
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // =====================================
+                // QUÉT LẠI
+                // =====================================
+
+                SizedBox(
+                  width: double.infinity,
+
+                  height: 54,
+
+                  child:
+                      FilledButton.tonalIcon(
+                    onPressed: () =>
+                        Navigator.pop(
+                      context,
+                    ),
+
+                    icon: const Icon(
+                      Icons
+                          .camera_alt_outlined,
+                    ),
+
+                    label:
+                        const Text(
+                      'Quét địa điểm khác',
+                    ),
                   ),
                 ),
               ],
@@ -1230,23 +1649,56 @@ class _PlaceDetailsPageState extends State<PlaceDetailsPage> {
     );
   }
 
-  Widget pill(IconData icon, String text) {
+  Widget pill(
+    IconData icon,
+    String text,
+  ) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE5F5EF),
-        borderRadius: BorderRadius.circular(999),
+      padding:
+          const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 9,
       ),
+
+      decoration: BoxDecoration(
+        color:
+            const Color(
+          0xFFE5F5EF,
+        ),
+
+        borderRadius:
+            BorderRadius.circular(
+          999,
+        ),
+      ),
+
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize:
+            MainAxisSize.min,
+
         children: [
-          Icon(icon, size: 17, color: const Color(0xFF087F5B)),
+          Icon(
+            icon,
+            size: 17,
+            color:
+                const Color(
+              0xFF087F5B,
+            ),
+          ),
+
           const SizedBox(width: 6),
+
           Text(
             text,
-            style: const TextStyle(
-              color: Color(0xFF087F5B),
-              fontWeight: FontWeight.w700,
+
+            style:
+                const TextStyle(
+              color:
+                  Color(
+                0xFF087F5B,
+              ),
+              fontWeight:
+                  FontWeight.w700,
             ),
           ),
         ],
@@ -1254,27 +1706,59 @@ class _PlaceDetailsPageState extends State<PlaceDetailsPage> {
     );
   }
 
-  Widget cardSection(String title, Widget child) {
+  Widget cardSection(
+    String title,
+    Widget child,
+  ) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFDDE9E4)),
+
+      padding:
+          const EdgeInsets.all(
+        18,
       ),
+
+      decoration:
+          BoxDecoration(
+        color: Colors.white,
+
+        borderRadius:
+            BorderRadius.circular(
+          22,
+        ),
+
+        border: Border.all(
+          color:
+              const Color(
+            0xFFDDE9E4,
+          ),
+        ),
+      ),
+
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+
         children: [
           Text(
             title,
-            style: const TextStyle(
+
+            style:
+                const TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF12372E),
+              fontWeight:
+                  FontWeight.w800,
+              color:
+                  Color(
+                0xFF12372E,
+              ),
             ),
           ),
-          const SizedBox(height: 12),
+
+          const SizedBox(
+            height: 12,
+          ),
+
           child,
         ],
       ),
