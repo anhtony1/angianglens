@@ -39,7 +39,7 @@ flutter:
     - assets/places/Nui_Cam/
     - assets/icon/app_icon.png
 flutter_launcher_icons:
-  android: true
+  android: false
   ios: true
   image_path: "assets/icon/app_icon.png"
   remove_alpha_ios: true
